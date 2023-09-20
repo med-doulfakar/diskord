@@ -23,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { FileUpload } from "../file-upload";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const fromSchema = z.object({
   name: z.string().nonempty({ message: "Please enter a server name" }),
@@ -31,6 +33,7 @@ const fromSchema = z.object({
 
 export const InitialModal = () => {
   const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -44,7 +47,14 @@ export const InitialModal = () => {
 
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (data: z.infer<typeof fromSchema>) => {
-    console.log(data);
+    try {
+      await axios.post('/api/servers', data);
+      form.reset();
+      router.refresh();
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    } 
   };
 
   if (!isMounted) return null;
