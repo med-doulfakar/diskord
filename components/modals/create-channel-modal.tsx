@@ -22,12 +22,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "../file-upload";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 import { ChannelType } from "@prisma/client";
-import { Channel } from "diagnostics_channel";
 import {
   Select,
   SelectContent,
@@ -35,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useEffect } from "react";
 
 const fromSchema = z.object({
   name: z
@@ -48,7 +47,7 @@ const fromSchema = z.object({
 
 export const CreateChannelModal = () => {
   const { isOpen, onClose, type, data } = useModal();
-  const { server } = data;
+  const { server , channelType } = data;
   const isModalOpen = isOpen && type === "createChannel";
   const router = useRouter();
 
@@ -56,9 +55,13 @@ export const CreateChannelModal = () => {
     resolver: zodResolver(fromSchema),
     defaultValues: {
       name: "",
-      type: ChannelType.TEXT,
+      type: channelType || ChannelType.TEXT,
     },
   });
+
+  useEffect(() => {
+    if (channelType) form.setValue("type", channelType);
+  }, [channelType, form]);
 
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (data: z.infer<typeof fromSchema>) => {
