@@ -14,7 +14,7 @@ export async function PATCH(
       return new NextResponse("Server ID missing", { status: 400 });
 
     const server = await db.server.update({
-      where: { id: params.serverId, userId: profile.id },
+      where: { id: params.serverId, userId: profile?.id },
       data: { inviteCode: uuidv4() },
     });
     return NextResponse.json(server);
